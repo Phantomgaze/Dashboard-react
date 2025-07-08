@@ -6,7 +6,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { useForm } from "react-hook-form";
+import { useForm, type UseFormReturn, type FieldValues } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -19,6 +19,7 @@ import {
   FormMessage,
 } from "./ui/form";
 import { Input } from "./ui/input";
+import { Button } from "./ui/button";
 import {
   Select,
   SelectContent,
@@ -26,30 +27,43 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Button } from "./ui/button";
 
 const formSchema = z.object({
-  username: z
-    .string()
-    .min(2, { message: "Username must be at least 2 characters!" })
-    .max(50),
-  email: z.string().email({ message: "Invalid email address!" }),
-  phone: z.string().min(10).max(15),
-  location: z.string().min(2),
-  role: z.enum(["admin", "user"]),
+  username: z.string().min(2, {
+    message: "Username must be at least 2 characters.",
+  }),
+  email: z.string().email({
+    message: "Please enter a valid email address.",
+  }),
+  phone: z.string().min(10, {
+    message: "Please enter a valid phone number.",
+  }),
+  location: z.string().min(2, {
+    message: "Please enter a valid location.",
+  }),
+  role: z.enum(["admin", "user"], {
+    required_error: "Please select a role.",
+  }),
 });
 
+type FormValues = z.infer<typeof formSchema>;
+
 const EditUser = () => {
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       username: "john.doe",
       email: "john.doe@gmail.com",
       phone: "+1 234 5678",
       location: "New York, NY",
-      role: "admin",
+      role: "user",
     },
   });
+
+  const onSubmit = (data: FormValues) => {
+    console.log(data);
+    // Handle form submission
+  };
   return (
     <SheetContent>
       <SheetHeader>
@@ -60,11 +74,14 @@ const EditUser = () => {
               <FormField
                 control={form.control}
                 name="username"
-                render={({ field }) => (
+                render={({ field }: { field: any }) => (
                   <FormItem>
                     <FormLabel>Username</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input
+                        placeholder="Enter username"
+                        {...field}
+                      />
                     </FormControl>
                     <FormDescription>
                       This is your public username.
@@ -76,11 +93,15 @@ const EditUser = () => {
               <FormField
                 control={form.control}
                 name="email"
-                render={({ field }) => (
+                render={({ field }: { field: any }) => (
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input
+                        type="email"
+                        placeholder="email@example.com"
+                        {...field}
+                      />
                     </FormControl>
                     <FormDescription>
                       Only admin can see your email.
@@ -92,11 +113,15 @@ const EditUser = () => {
               <FormField
                 control={form.control}
                 name="phone"
-                render={({ field }) => (
+                render={({ field }: { field: any }) => (
                   <FormItem>
                     <FormLabel>Phone</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input
+                        type="tel"
+                        placeholder="+1 (555) 123-4567"
+                        {...field}
+                      />
                     </FormControl>
                     <FormDescription>
                       Only admin can see your phone number.
@@ -108,11 +133,14 @@ const EditUser = () => {
               <FormField
                 control={form.control}
                 name="location"
-                render={({ field }) => (
+                render={({ field }: { field: any }) => (
                   <FormItem>
                     <FormLabel>Location</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input
+                        placeholder="New York, NY"
+                        {...field}
+                      />
                     </FormControl>
                     <FormDescription>
                       This is the public location.
@@ -124,11 +152,11 @@ const EditUser = () => {
               <FormField
                 control={form.control}
                 name="role"
-                render={({ field }) => (
+                render={({ field }: { field: any }) => (
                   <FormItem>
                     <FormLabel>Role</FormLabel>
                     <FormControl>
-                      <Select>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <SelectTrigger>
                           <SelectValue placeholder="Role" />
                         </SelectTrigger>
@@ -145,7 +173,9 @@ const EditUser = () => {
                   </FormItem>
                 )}
               />
-              <Button type="submit">Submit</Button>
+              <Button type="submit" className="mt-4">
+                Save changes
+              </Button>
             </form>
           </Form>
         </SheetDescription>
