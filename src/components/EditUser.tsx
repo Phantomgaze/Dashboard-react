@@ -6,7 +6,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { useForm, type UseFormReturn, type FieldValues } from "react-hook-form";
+import { useForm, type FieldValues } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -41,7 +41,7 @@ const formSchema = z.object({
   location: z.string().min(2, {
     message: "Please enter a valid location.",
   }),
-  role: z.enum(["admin", "user"], {
+  role: z.enum(["user", "admin"], {
     required_error: "Please select a role.",
   }),
 });
@@ -50,13 +50,13 @@ type FormValues = z.infer<typeof formSchema>;
 
 const EditUser = () => {
   const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema) as any, // Type assertion to fix the resolver type
     defaultValues: {
-      username: "john.doe",
-      email: "john.doe@gmail.com",
-      phone: "+1 234 5678",
-      location: "New York, NY",
-      role: "user",
+      username: "",
+      email: "",
+      phone: "",
+      location: "",
+      role: "user" as const, // Default to 'user' role
     },
   });
 
@@ -64,6 +64,7 @@ const EditUser = () => {
     console.log(data);
     // Handle form submission
   };
+
   return (
     <SheetContent>
       <SheetHeader>
@@ -74,7 +75,7 @@ const EditUser = () => {
               <FormField
                 control={form.control}
                 name="username"
-                render={({ field }: { field: any }) => (
+                render={({ field }) => (
                   <FormItem>
                     <FormLabel>Username</FormLabel>
                     <FormControl>
@@ -93,7 +94,7 @@ const EditUser = () => {
               <FormField
                 control={form.control}
                 name="email"
-                render={({ field }: { field: any }) => (
+                render={({ field }) => (
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
@@ -113,7 +114,7 @@ const EditUser = () => {
               <FormField
                 control={form.control}
                 name="phone"
-                render={({ field }: { field: any }) => (
+                render={({ field }) => (
                   <FormItem>
                     <FormLabel>Phone</FormLabel>
                     <FormControl>
@@ -133,7 +134,7 @@ const EditUser = () => {
               <FormField
                 control={form.control}
                 name="location"
-                render={({ field }: { field: any }) => (
+                render={({ field }) => (
                   <FormItem>
                     <FormLabel>Location</FormLabel>
                     <FormControl>
@@ -152,17 +153,17 @@ const EditUser = () => {
               <FormField
                 control={form.control}
                 name="role"
-                render={({ field }: { field: any }) => (
+                render={({ field }) => (
                   <FormItem>
                     <FormLabel>Role</FormLabel>
                     <FormControl>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select onValueChange={field.onChange} value={field.value}>
                         <SelectTrigger>
-                          <SelectValue placeholder="Role" />
+                          <SelectValue placeholder="Select a role" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="admin">Admin</SelectItem>
                           <SelectItem value="user">User</SelectItem>
+                          <SelectItem value="admin">Admin</SelectItem>
                         </SelectContent>
                       </Select>
                     </FormControl>
