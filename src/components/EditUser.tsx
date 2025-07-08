@@ -50,7 +50,6 @@ type FormValues = z.infer<typeof formSchema>;
 
 const EditUser = () => {
   const form = useForm<FormValues>({
-    // @ts-expect-error - Type mismatch between zod and react-hook-form types
     resolver: zodResolver(formSchema),
     defaultValues: {
       username: "",
