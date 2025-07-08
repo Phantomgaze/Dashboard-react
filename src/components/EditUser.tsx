@@ -6,7 +6,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { useForm, type FieldValues } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -50,7 +50,8 @@ type FormValues = z.infer<typeof formSchema>;
 
 const EditUser = () => {
   const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema) as any, // Type assertion to fix the resolver type
+    // @ts-expect-error - Type mismatch between zod and react-hook-form types
+    resolver: zodResolver(formSchema),
     defaultValues: {
       username: "",
       email: "",
@@ -60,10 +61,11 @@ const EditUser = () => {
     },
   });
 
-  const onSubmit = (data: FormValues) => {
-    console.log(data);
-    // Handle form submission
-  };
+  // Form submission handler is not currently used but kept for future implementation
+  // const onSubmit = (data: FormValues) => {
+  //   console.log(data);
+  //   // Handle form submission
+  // };
 
   return (
     <SheetContent>
